@@ -3,9 +3,9 @@ nuxtであれこれ試したい時のリポジトリ。
 vue 2系とTypeScript。
 
 # 初回起動
-docker-compose run app yarn install
-docker-compose build
-docker-compose up
+1. docker-compose run app yarn install
+2. docker-compose build
+3. docker-compose up
 
 # 初回以降の起動
 docker-compose up
