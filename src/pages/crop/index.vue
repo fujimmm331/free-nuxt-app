@@ -5,22 +5,36 @@
       id="volume"
       min="100"
       max="400"
-      v-model="scale"
+      v-model="percent"
       @input="onInputScale"
     />
     <input type="file" id="file" @input="onInputFile" />
     <canvas class="canvas" ref="cvs" id="cvs" width="300" height="400" />
-    <button @click="exportImage" v-text="'切り取り'" />
-    <canvas ref="out" id="out" width="200" height="200" />
+    <button @click="onCropImg" v-text="'切り取り'" />
+    <canvas class="canvas" ref="out" id="out" width="200" height="200" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 
+type Image = {
+  element: HTMLImageElement | null
+  width: number
+  height: number
+}
+
+type DrawImageArg = {
+  sourceWidth: number
+  sourceHeight: number
+  destinationWidth: number
+  destinationHeight: number
+}
+
 interface ComponentData {
-  scale: number
-  image: HTMLImageElement | null
+  percent: number
+  image: Image
+  aspectRatio: number
 }
 
 export default Vue.extend({
@@ -28,22 +42,58 @@ export default Vue.extend({
   data: () =>
     ({
       text: 'crop page is running',
-      scale: 0,
-      image: null,
+      percent: 0,
+      image: {
+        element: null,
+        height: 0,
+        width: 0,
+      },
+      aspectRatio: 1.2,
     } as ComponentData),
+  computed: {
+    scale(): number {
+      return this.percent * 0.01
+    },
+  },
   methods: {
     initializeScale(): void {
-      this.scale = 100
+      this.percent = 100
     },
     onCropImg(): void {
-      console.log('crop image')
-    },
-    onInputScale(): void {
-      if (!this.image) {
+      const canvas = this.$refs.out as HTMLCanvasElement
+
+      if (!canvas || !this.image.element) {
         return
       }
 
-      this.drawImage(this.image, this.scale / 100)
+      const drawImageArg: DrawImageArg = {
+        sourceWidth: this.image.element.width,
+        sourceHeight: this.image.element.height / this.aspectRatio,
+        destinationWidth: this.image.element.width * this.scale,
+        destinationHeight:
+          (this.image.element.height / this.aspectRatio) * this.scale,
+      }
+
+      this.drawImage(this.image.element, canvas, drawImageArg)
+      console.log('crop image')
+    },
+    onInputScale(): void {
+      if (!this.image.element) {
+        return
+      }
+
+      const drawImageArg: DrawImageArg = {
+        sourceWidth: this.image.element.width,
+        sourceHeight: this.image.element.height,
+        destinationWidth: this.image.element.width * this.scale,
+        destinationHeight: this.image.element.height * this.scale,
+      }
+
+      this.drawImage(
+        this.image.element,
+        this.$refs.cvs as HTMLCanvasElement,
+        drawImageArg,
+      )
     },
     onInputFile(event: { target: HTMLInputElement }): void {
       if (!event.target.files) {
@@ -63,20 +113,32 @@ export default Vue.extend({
 
         image.src = e.target.result as string
         image.onload = () => {
-          this.drawImage(image)
+          const drawImageArg: DrawImageArg = {
+            sourceWidth: image.width,
+            sourceHeight: image.height,
+            destinationWidth: image.width,
+            destinationHeight: image.height,
+          }
+
+          this.drawImage(
+            image,
+            this.$refs.cvs as HTMLCanvasElement,
+            drawImageArg,
+          )
         }
       }
 
-      this.image = image
+      this.image.element = image
+      this.image.width = image.width
+      this.image.height = image.height
     },
-    drawImage(image: HTMLImageElement, scale = 1) {
-      const canvas = this.$refs.cvs as HTMLCanvasElement
-      if (!canvas) {
-        return
-      }
-
-      canvas.width = image.width
-      canvas.height = image.height
+    drawImage(
+      image: HTMLImageElement,
+      canvas: HTMLCanvasElement,
+      arg: DrawImageArg,
+    ) {
+      canvas.width = arg.sourceWidth
+      canvas.height = arg.sourceHeight
       const ctx = canvas.getContext('2d')
 
       if (!ctx) {
@@ -87,16 +149,21 @@ export default Vue.extend({
         image,
         0,
         0,
-        image.width,
-        image.height,
+        arg.sourceWidth,
+        arg.sourceHeight,
         0,
         0,
-        image.width * scale,
-        image.height * scale,
+        arg.destinationWidth,
+        arg.destinationHeight,
       )
+
+      if (canvas.id === 'out') {
+        return
+      }
+
       ctx.strokeStyle = 'red'
       ctx.lineWidth = 10
-      ctx.strokeRect(0, 1, image.width, image.height / 1.2) // 赤い枠
+      ctx.strokeRect(0, 1, image.width, image.height / this.aspectRatio) // 赤い枠
     },
     exportImage() {
       const canvas = this.$refs.cvs as HTMLCanvasElement
