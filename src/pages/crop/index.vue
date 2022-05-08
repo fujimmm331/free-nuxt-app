@@ -184,14 +184,7 @@ export default Vue.extend({
         return
       }
 
-      ctx.strokeStyle = 'red'
-      ctx.lineWidth = 10
-      ctx.strokeRect(
-        0,
-        (image.height - image.width / this.aspectRatio) / 2,
-        image.width,
-        image.width / this.aspectRatio,
-      ) // 赤い枠
+      this.strokeRect(ctx, image)
     },
     /**
      * 画像を出力する
@@ -250,6 +243,37 @@ export default Vue.extend({
     onMouseOut(): void {
       this.isDragging = false
       console.log('dragend')
+    },
+    /**
+     * 画像から赤枠を描画する
+     */
+    strokeRect(ctx: CanvasRenderingContext2D, image: HTMLImageElement): void {
+      const whichUse =
+        Math.sign(image.height - image.width / this.aspectRatio) === -1
+          ? 'height'
+          : 'width'
+      const prop = {
+        height: {
+          x: (image.width - image.height * this.aspectRatio) / 2,
+          y: 0,
+          w: image.height * this.aspectRatio,
+          h: image.height,
+        },
+        width: {
+          x: 0,
+          y: (image.height - image.width / this.aspectRatio) / 2,
+          w: image.width,
+          h: image.width / this.aspectRatio,
+        },
+      }
+      ctx.strokeStyle = 'red'
+      ctx.lineWidth = 10
+      ctx.strokeRect(
+        prop[whichUse].x,
+        prop[whichUse].y,
+        prop[whichUse].w,
+        prop[whichUse].h,
+      ) // 赤い枠
     },
   },
 })
