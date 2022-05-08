@@ -70,9 +70,15 @@ export default Vue.extend({
     },
   },
   methods: {
+    /**
+     * 拡大縮小率をリセットする
+     */
     initializeScale(): void {
       this.percent = 100
     },
+    /**
+     * 画像を切り取る処理
+     */
     onCropImg(): void {
       const canvas = this.$refs.out as HTMLCanvasElement
 
@@ -89,6 +95,9 @@ export default Vue.extend({
       this.drawImage(this.image.element, canvas, drawImageArg)
       console.log('crop image')
     },
+    /**
+     * 拡大縮小率をもとに画像を再描画する
+     */
     onInputScale(): void {
       if (!this.image.element) {
         return
@@ -105,6 +114,10 @@ export default Vue.extend({
         drawImageArg,
       )
     },
+    /**
+     * 入力された画像ファイルをもとに、画面に描画する
+     * @param event イベント引数。画像が格納されている
+     */
     onInputFile(event: { target: HTMLInputElement }): void {
       if (!event.target.files) {
         return
@@ -143,6 +156,12 @@ export default Vue.extend({
       this.image.width = image.width
       this.image.height = image.height
     },
+    /**
+     * 画像を描画する
+     * @param image 画像
+     * @param canvas 描画するcanvas
+     * @param arg drawImageに使用する引数
+     */
     drawImage(
       image: HTMLImageElement,
       canvas: HTMLCanvasElement,
@@ -176,6 +195,9 @@ export default Vue.extend({
       ctx.lineWidth = 10
       ctx.strokeRect(0, 1, image.width, image.height / this.aspectRatio) // 赤い枠
     },
+    /**
+     * 画像を出力する
+     */
     exportImage() {
       const canvas = this.$refs.cvs as HTMLCanvasElement
       const link = document.createElement('a')
