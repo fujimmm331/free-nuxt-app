@@ -9,7 +9,17 @@
       @input="onInputScale"
     />
     <input type="file" id="file" @input="onInputFile" />
-    <canvas class="canvas" ref="cvs" id="cvs" width="300" height="400" />
+    <canvas
+      class="canvas"
+      ref="cvs"
+      id="cvs"
+      width="300"
+      height="400"
+      @mousedown="onMouseDown"
+      @mousemove="onMouseMove"
+      @mouseup="onMouseUp"
+      @mouseout="onMouseOut"
+    />
     <button @click="onCropImg" v-text="'切り取り'" />
     <canvas class="canvas" ref="out" id="out" width="200" height="200" />
   </div>
@@ -35,6 +45,7 @@ interface ComponentData {
   aspectRatio: number
   centerX: number
   centerY: number
+  isDragging: boolean
 }
 
 export default Vue.extend({
@@ -51,6 +62,7 @@ export default Vue.extend({
       aspectRatio: 1.2,
       centerX: 0,
       centerY: 0,
+      isDragging: false,
     } as ComponentData),
   computed: {
     scale(): number {
@@ -176,6 +188,36 @@ export default Vue.extend({
       link.href = canvas.toDataURL()
       link.click()
       console.log('export')
+    },
+    /**
+     * ドラッグ開始時に発火するメソッド
+     */
+    onMouseDown(): void {
+      this.isDragging = true
+      console.log('dragStart')
+    },
+    /**
+     * ドラッグ終了時に発火するメソッド
+     */
+    onMouseUp(): void {
+      this.isDragging = false
+      console.log('dragEnd')
+    },
+    /**
+     * ドラッグしたまま移動する際に発火するメソッド
+     */
+    onMouseMove(): void {
+      if (!this.isDragging) {
+        return
+      }
+      console.log('moving')
+    },
+    /**
+     * 画像からでたときに発火するメソッド
+     */
+    onMouseOut(): void {
+      this.isDragging = false
+      console.log('dragend')
     },
   },
 })
