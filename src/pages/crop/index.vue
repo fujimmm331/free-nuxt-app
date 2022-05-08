@@ -13,26 +13,18 @@
       class="canvas"
       ref="cvs"
       id="cvs"
-      width="300"
-      height="400"
       @mousedown="onMouseDown"
       @mousemove="onMouseMove"
       @mouseup="onMouseUp"
       @mouseout="onMouseOut"
     />
     <button @click="onCropImg" v-text="'切り取り'" />
-    <canvas class="canvas" ref="out" id="out" width="200" height="200" />
+    <canvas class="canvas" ref="out" id="out" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-
-type Image = {
-  element: HTMLImageElement | null
-  width: number
-  height: number
-}
 
 type DrawImageArg = {
   drawCenterX: number
@@ -41,7 +33,7 @@ type DrawImageArg = {
 
 interface ComponentData {
   percent: number
-  image: Image
+  image: HTMLImageElement | null
   aspectRatio: number
   centerX: number
   centerY: number
@@ -56,11 +48,7 @@ export default Vue.extend({
     ({
       text: 'crop page is running',
       percent: 0,
-      image: {
-        element: null,
-        height: 0,
-        width: 0,
-      },
+      image: null,
       aspectRatio: 1.2,
       centerX: 0,
       centerY: 0,
@@ -86,7 +74,7 @@ export default Vue.extend({
     onCropImg(): void {
       const canvas = this.$refs.out as HTMLCanvasElement
 
-      if (!canvas || !this.image.element) {
+      if (!canvas || !this.image) {
         return
       }
 
@@ -95,14 +83,14 @@ export default Vue.extend({
         drawCenterY: this.centerY,
       }
 
-      this.drawImage(this.image.element, canvas, drawImageArg)
+      this.drawImage(this.image, canvas, drawImageArg)
       console.log('crop image')
     },
     /**
      * 拡大縮小率をもとに画像を再描画する
      */
     onInputScale(): void {
-      if (!this.image.element) {
+      if (!this.image) {
         return
       }
 
@@ -112,7 +100,7 @@ export default Vue.extend({
       }
 
       this.drawImage(
-        this.image.element,
+        this.image,
         this.$refs.cvs as HTMLCanvasElement,
         drawImageArg,
       )
@@ -155,9 +143,7 @@ export default Vue.extend({
         }
       }
 
-      this.image.element = image
-      this.image.width = image.width
-      this.image.height = image.height
+      this.image = image
     },
     /**
      * 画像を描画する
@@ -170,13 +156,17 @@ export default Vue.extend({
       canvas: HTMLCanvasElement,
       arg: DrawImageArg,
     ) {
-      canvas.width = image.width
-      canvas.height = image.height
       const ctx = canvas.getContext('2d')
+      const isUseOutCanvas = canvas.id === 'out'
 
       if (!ctx) {
         return
       }
+
+      canvas.width = image.width
+      canvas.height = isUseOutCanvas
+        ? image.height / this.aspectRatio
+        : image.height
 
       ctx.drawImage(
         image,
@@ -190,13 +180,18 @@ export default Vue.extend({
         image.height * this.scale,
       )
 
-      if (canvas.id === 'out') {
+      if (isUseOutCanvas) {
         return
       }
 
       ctx.strokeStyle = 'red'
       ctx.lineWidth = 10
-      ctx.strokeRect(0, 1, image.width, image.height / this.aspectRatio) // 赤い枠
+      ctx.strokeRect(
+        0,
+        (image.height - image.height / this.aspectRatio) / 2,
+        image.width,
+        image.height / this.aspectRatio,
+      ) // 赤い枠
     },
     /**
      * 画像を出力する
@@ -244,7 +239,7 @@ export default Vue.extend({
       }
 
       this.drawImage(
-        this.image.element!,
+        this.image!,
         this.$refs.cvs as HTMLCanvasElement,
         drawImageArg,
       )
