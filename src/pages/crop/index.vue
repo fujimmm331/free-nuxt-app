@@ -3,7 +3,7 @@
     <input
       type="range"
       id="volume"
-      min="100"
+      min="10"
       max="400"
       v-model="percent"
       @input="onInputScale"
@@ -13,13 +13,15 @@
       class="canvas"
       ref="cvs"
       id="cvs"
+      width="1000"
+      height="800"
       @mousedown="onMouseDown"
       @mousemove="onMouseMove"
       @mouseup="onMouseUp"
       @mouseout="onMouseOut"
     />
     <button @click="onCropImg" v-text="'切り取り'" />
-    <canvas class="canvas" ref="out" id="out" />
+    <canvas class="canvas" ref="out" id="out" width="1000" height="500" />
   </div>
 </template>
 
@@ -47,7 +49,7 @@ export default Vue.extend({
   data: () =>
     ({
       text: 'crop page is running',
-      percent: 0,
+      percent: 100,
       image: null,
       aspectRatio: 2,
       centerX: 0,
@@ -163,10 +165,8 @@ export default Vue.extend({
         return
       }
 
-      canvas.width = image.width
-      canvas.height = isUseOutCanvas
-        ? image.width / this.aspectRatio
-        : image.height
+      ctx.fillStyle = '#c8c8c8'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       ctx.drawImage(
         image,
@@ -248,32 +248,9 @@ export default Vue.extend({
      * 画像から赤枠を描画する
      */
     strokeRect(ctx: CanvasRenderingContext2D, image: HTMLImageElement): void {
-      const whichUse =
-        Math.sign(image.height - image.width / this.aspectRatio) === -1
-          ? 'height'
-          : 'width'
-      const prop = {
-        height: {
-          x: (image.width - image.height * this.aspectRatio) / 2,
-          y: 0,
-          w: image.height * this.aspectRatio,
-          h: image.height,
-        },
-        width: {
-          x: 0,
-          y: (image.height - image.width / this.aspectRatio) / 2,
-          w: image.width,
-          h: image.width / this.aspectRatio,
-        },
-      }
       ctx.strokeStyle = 'red'
       ctx.lineWidth = 10
-      ctx.strokeRect(
-        prop[whichUse].x,
-        prop[whichUse].y,
-        prop[whichUse].w,
-        prop[whichUse].h,
-      ) // 赤い枠
+      ctx.strokeRect(5, 150, 990, 500) // 赤い枠
     },
   },
 })
