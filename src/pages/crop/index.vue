@@ -35,8 +35,8 @@ type Image = {
 }
 
 type DrawImageArg = {
-  destinationWidth: number
-  destinationHeight: number
+  drawCenterX: number
+  drawCenterY: number
 }
 
 interface ComponentData {
@@ -46,6 +46,8 @@ interface ComponentData {
   centerX: number
   centerY: number
   isDragging: boolean
+  startDragX: number | null
+  startDragY: number | null
 }
 
 export default Vue.extend({
@@ -63,6 +65,8 @@ export default Vue.extend({
       centerX: 0,
       centerY: 0,
       isDragging: false,
+      startDragX: null,
+      startDragY: null,
     } as ComponentData),
   computed: {
     scale(): number {
@@ -87,9 +91,8 @@ export default Vue.extend({
       }
 
       const drawImageArg: DrawImageArg = {
-        destinationWidth: this.image.element.width * this.scale,
-        destinationHeight:
-          (this.image.element.height / this.aspectRatio) * this.scale,
+        drawCenterX: this.centerX,
+        drawCenterY: this.centerY,
       }
 
       this.drawImage(this.image.element, canvas, drawImageArg)
@@ -104,8 +107,8 @@ export default Vue.extend({
       }
 
       const drawImageArg: DrawImageArg = {
-        destinationWidth: this.image.element.width * this.scale,
-        destinationHeight: this.image.element.height * this.scale,
+        drawCenterX: this.centerX,
+        drawCenterY: this.centerY,
       }
 
       this.drawImage(
@@ -136,13 +139,13 @@ export default Vue.extend({
 
         image.src = e.target.result as string
         image.onload = () => {
-          const drawImageArg: DrawImageArg = {
-            destinationWidth: image.width,
-            destinationHeight: image.height,
-          }
-
           this.centerX = image.width / 2
           this.centerY = image.height / 2
+
+          const drawImageArg: DrawImageArg = {
+            drawCenterX: this.centerX,
+            drawCenterY: this.centerY,
+          }
 
           this.drawImage(
             image,
@@ -181,10 +184,10 @@ export default Vue.extend({
         0,
         image.width,
         image.height,
-        canvas.width / 2 - this.centerX * this.scale,
-        canvas.height / 2 - this.centerY * this.scale,
-        arg.destinationWidth,
-        arg.destinationHeight,
+        canvas.width / 2 - arg.drawCenterX * this.scale,
+        canvas.height / 2 - arg.drawCenterY * this.scale,
+        image.width * this.scale,
+        image.height * this.scale,
       )
 
       if (canvas.id === 'out') {
@@ -214,25 +217,37 @@ export default Vue.extend({
     /**
      * ドラッグ開始時に発火するメソッド
      */
-    onMouseDown(): void {
+    onMouseDown(e: MouseEvent): void {
       this.isDragging = true
-      console.log('dragStart')
+      this.startDragX = e.pageX
+      this.startDragY = e.pageY
     },
     /**
      * ドラッグ終了時に発火するメソッド
      */
-    onMouseUp(): void {
+    onMouseUp(e: MouseEvent): void {
+      this.centerX += (this.startDragX! - e.pageX) / this.scale
+      this.centerY += (this.startDragY! - e.pageY) / this.scale
       this.isDragging = false
-      console.log('dragEnd')
     },
     /**
      * ドラッグしたまま移動する際に発火するメソッド
      */
-    onMouseMove(): void {
+    onMouseMove(e: MouseEvent): void {
       if (!this.isDragging) {
         return
       }
-      console.log('moving')
+
+      const drawImageArg: DrawImageArg = {
+        drawCenterX: this.centerX + (this.startDragX! - e.pageX) / this.scale,
+        drawCenterY: this.centerY + (this.startDragY! - e.pageY) / this.scale,
+      }
+
+      this.drawImage(
+        this.image.element!,
+        this.$refs.cvs as HTMLCanvasElement,
+        drawImageArg,
+      )
     },
     /**
      * 画像からでたときに発火するメソッド
