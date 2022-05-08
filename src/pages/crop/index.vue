@@ -3,8 +3,8 @@
     <input
       type="range"
       id="volume"
-      min="10"
-      max="400"
+      :min="min"
+      :max="max"
       v-model="percent"
       @input="onInputScale"
     />
@@ -22,6 +22,7 @@
       @mouseup="onMouseUp"
       @touchend="onTouchEnd"
       @mouseout="onMouseUp"
+      @mousewheel="onMouseWheel"
     />
     <button @click="onCropImg" v-text="'切り取り'" />
     <canvas class="canvas" ref="out" id="out" width="1000" height="500" />
@@ -45,6 +46,8 @@ interface ComponentData {
   isDragging: boolean
   startDragX: number | null
   startDragY: number | null
+  min: number
+  max: number
 }
 
 export default Vue.extend({
@@ -53,6 +56,8 @@ export default Vue.extend({
     ({
       text: 'crop page is running',
       percent: 100,
+      min: 10,
+      max: 400,
       image: null,
       aspectRatio: 2,
       centerX: 0,
@@ -291,19 +296,19 @@ export default Vue.extend({
       this.isDragging = false
     },
     /**
-     * 画像からでたときに発火するメソッド
-     */
-    onMouseOut(): void {
-      this.isDragging = false
-      console.log('dragend')
-    },
-    /**
      * 画像から赤枠を描画する
      */
     strokeRect(ctx: CanvasRenderingContext2D, image: HTMLImageElement): void {
       ctx.strokeStyle = 'red'
       ctx.lineWidth = 10
       ctx.strokeRect(5, 150, 990, 500) // 赤い枠
+    },
+    onMouseWheel(e: WheelEvent) {
+      if (this.percent < this.min || this.percent > this.max) {
+        return
+      }
+      this.percent -= e.deltaY
+      this.onInputScale()
     },
   },
 })
