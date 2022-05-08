@@ -49,7 +49,7 @@ export default Vue.extend({
       text: 'crop page is running',
       percent: 0,
       image: null,
-      aspectRatio: 1.2,
+      aspectRatio: 2,
       centerX: 0,
       centerY: 0,
       isDragging: false,
@@ -165,7 +165,7 @@ export default Vue.extend({
 
       canvas.width = image.width
       canvas.height = isUseOutCanvas
-        ? image.height / this.aspectRatio
+        ? image.width / this.aspectRatio
         : image.height
 
       ctx.drawImage(
@@ -188,9 +188,9 @@ export default Vue.extend({
       ctx.lineWidth = 10
       ctx.strokeRect(
         0,
-        (image.height - image.height / this.aspectRatio) / 2,
+        (image.height - image.width / this.aspectRatio) / 2,
         image.width,
-        image.height / this.aspectRatio,
+        image.width / this.aspectRatio,
       ) // 赤い枠
     },
     /**
