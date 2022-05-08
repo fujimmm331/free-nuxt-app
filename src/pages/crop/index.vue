@@ -25,8 +25,6 @@ type Image = {
 }
 
 type DrawImageArg = {
-  sourceWidth: number
-  sourceHeight: number
   destinationWidth: number
   destinationHeight: number
 }
@@ -67,8 +65,6 @@ export default Vue.extend({
       }
 
       const drawImageArg: DrawImageArg = {
-        sourceWidth: this.image.element.width,
-        sourceHeight: this.image.element.height / this.aspectRatio,
         destinationWidth: this.image.element.width * this.scale,
         destinationHeight:
           (this.image.element.height / this.aspectRatio) * this.scale,
@@ -83,8 +79,6 @@ export default Vue.extend({
       }
 
       const drawImageArg: DrawImageArg = {
-        sourceWidth: this.image.element.width,
-        sourceHeight: this.image.element.height,
         destinationWidth: this.image.element.width * this.scale,
         destinationHeight: this.image.element.height * this.scale,
       }
@@ -114,8 +108,6 @@ export default Vue.extend({
         image.src = e.target.result as string
         image.onload = () => {
           const drawImageArg: DrawImageArg = {
-            sourceWidth: image.width,
-            sourceHeight: image.height,
             destinationWidth: image.width,
             destinationHeight: image.height,
           }
@@ -137,8 +129,8 @@ export default Vue.extend({
       canvas: HTMLCanvasElement,
       arg: DrawImageArg,
     ) {
-      canvas.width = arg.sourceWidth
-      canvas.height = arg.sourceHeight
+      canvas.width = image.width
+      canvas.height = image.height
       const ctx = canvas.getContext('2d')
 
       if (!ctx) {
@@ -149,8 +141,8 @@ export default Vue.extend({
         image,
         0,
         0,
-        arg.sourceWidth,
-        arg.sourceHeight,
+        image.width,
+        image.height,
         0,
         0,
         arg.destinationWidth,
