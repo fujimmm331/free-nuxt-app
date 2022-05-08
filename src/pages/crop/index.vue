@@ -16,9 +16,12 @@
       width="1000"
       height="800"
       @mousedown="onMouseDown"
+      @touchstart="onTouchStart"
       @mousemove="onMouseMove"
+      @touchmove="onTouchMove"
       @mouseup="onMouseUp"
-      @mouseout="onMouseOut"
+      @touchend="onTouchEnd"
+      @mouseout="onMouseUp"
     />
     <button @click="onCropImg" v-text="'切り取り'" />
     <canvas class="canvas" ref="out" id="out" width="1000" height="500" />
@@ -206,29 +209,57 @@ export default Vue.extend({
      * ドラッグ開始時に発火するメソッド
      */
     onMouseDown(e: MouseEvent): void {
+      this.setDragPoint(e.pageX, e.pageY)
+    },
+    /**
+     * ドラッグ開始時に発火するメソッド(スマホ用)
+     */
+    onTouchStart(e: TouchEvent) {
+      this.setDragPoint(e.changedTouches[0].pageX, e.changedTouches[0].pageY)
+    },
+    /**
+     * ドラッグ開始地点をセットする
+     */
+    setDragPoint(pageX: number, pageY: number) {
       this.isDragging = true
-      this.startDragX = e.pageX
-      this.startDragY = e.pageY
+      this.startDragX = pageX
+      this.startDragY = pageY
     },
     /**
      * ドラッグ終了時に発火するメソッド
      */
     onMouseUp(e: MouseEvent): void {
-      this.centerX += (this.startDragX! - e.pageX) / this.scale
-      this.centerY += (this.startDragY! - e.pageY) / this.scale
-      this.isDragging = false
+      this.drawMovingEnd(e.pageX, e.pageY)
+    },
+    /**
+     * ドラッグ終了時に発火するメソッド(スマホ用)
+     */
+    onTouchEnd(e: TouchEvent): void {
+      this.drawMovingEnd(e.changedTouches[0].pageX, e.changedTouches[0].pageY)
     },
     /**
      * ドラッグしたまま移動する際に発火するメソッド
      */
     onMouseMove(e: MouseEvent): void {
+      this.drawMoving(e.pageX, e.pageY)
+    },
+    /**
+     * ドラッグしたまま移動する際に発火するメソッド(スマホ用)
+     */
+    onTouchMove(e: TouchEvent): void {
+      this.drawMoving(e.changedTouches[0].pageX, e.changedTouches[0].pageY)
+    },
+    /**
+     * ドラッグ中に画像を描画する
+     */
+    drawMoving(pageX: number, pageY: number): void {
       if (!this.isDragging) {
         return
       }
 
       const drawImageArg: DrawImageArg = {
-        drawCenterX: this.centerX + (this.startDragX! - e.pageX) / this.scale,
-        drawCenterY: this.centerY + (this.startDragY! - e.pageY) / this.scale,
+        drawCenterX: this.centerX + (this.startDragX! - pageX) / this.scale,
+        drawCenterY: this.centerY + (this.startDragY! - pageY) / this.scale,
       }
 
       this.drawImage(
@@ -236,6 +267,28 @@ export default Vue.extend({
         this.$refs.cvs as HTMLCanvasElement,
         drawImageArg,
       )
+    },
+    /**
+     * ドラッグ中に画像を描画する
+     */
+    drawMovingEnd(pageX: number, pageY: number): void {
+      if (!this.isDragging) {
+        return
+      }
+      this.centerX += (this.startDragX! - pageX) / this.scale
+      this.centerY += (this.startDragY! - pageY) / this.scale
+
+      const drawImageArg: DrawImageArg = {
+        drawCenterX: this.centerX,
+        drawCenterY: this.centerY,
+      }
+
+      this.drawImage(
+        this.image!,
+        this.$refs.cvs as HTMLCanvasElement,
+        drawImageArg,
+      )
+      this.isDragging = false
     },
     /**
      * 画像からでたときに発火するメソッド
@@ -257,6 +310,6 @@ export default Vue.extend({
 </script>
 <style lang="css">
 .canvas {
-  width: 400px;
+  width: 100%;
 }
 </style>
