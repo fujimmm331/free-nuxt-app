@@ -33,6 +33,8 @@ interface ComponentData {
   percent: number
   image: Image
   aspectRatio: number
+  centerX: number
+  centerY: number
 }
 
 export default Vue.extend({
@@ -47,6 +49,8 @@ export default Vue.extend({
         width: 0,
       },
       aspectRatio: 1.2,
+      centerX: 0,
+      centerY: 0,
     } as ComponentData),
   computed: {
     scale(): number {
@@ -112,6 +116,9 @@ export default Vue.extend({
             destinationHeight: image.height,
           }
 
+          this.centerX = image.width / 2
+          this.centerY = image.height / 2
+
           this.drawImage(
             image,
             this.$refs.cvs as HTMLCanvasElement,
@@ -143,8 +150,8 @@ export default Vue.extend({
         0,
         image.width,
         image.height,
-        0,
-        0,
+        canvas.width / 2 - this.centerX * this.scale,
+        canvas.height / 2 - this.centerY * this.scale,
         arg.destinationWidth,
         arg.destinationHeight,
       )
