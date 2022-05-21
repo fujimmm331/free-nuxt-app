@@ -6,7 +6,11 @@ export const handlers = [
       ctx.json({
         products: [
           {
-            name: 'name',
+            name: 'name1',
+            price: 1200,
+            memo: 'memo',
+            isNew: true,
+            created_at: new Date
           }
         ],
       }),
