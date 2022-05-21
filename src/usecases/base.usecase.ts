@@ -5,9 +5,11 @@ import { keyValueObject } from "~/models/keyValue.model";
 /**
  * APIの実行を行うクラス。axiosをラップし、正常時はデータを返却、異常時はerror.vueへ描画する
  */
-export default class UseCase {
+export default class BaseUseCase {
   _axios: NuxtAxiosInstance
   _context: Context
+
+  readonly basePath = 'https://sample.com/api/v1'
 
   constructor(axios: NuxtAxiosInstance, context: Context) {
     this._axios = axios
@@ -16,16 +18,13 @@ export default class UseCase {
 
   /**
    * GETの処理を行う
-   * @param path APIのパス
+   * @param endPoint APIのパス
    * @param params パラメータ
    */
-  async get(path: string, params: keyValueObject = {} ) {
-    const response = await this._axios.get(path, params)
+  async get(endPoint: string, params: keyValueObject = {} ) {
+    const response = await this._axios.get(this.basePath + endPoint, params)
       .catch((error) => {
-        this._context.error({
-          statusCode: error.response.status,
-          message: '失敗'
-        })
+        throw new Error(error);
       })
     return response
   }
