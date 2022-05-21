@@ -25,6 +25,8 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    /** APIのモックを動かすプラグイン */
+    { src: '@/plugins/worker', mode: 'client' }
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
