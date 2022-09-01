@@ -1,4 +1,4 @@
-import { worker } from "~/mocks/browser"
+import { worker } from "@/../mocks/browser" 
 /**
  * MSWを起動させる定義ファイル
  */

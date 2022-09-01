@@ -1,6 +1,6 @@
 import { Context } from "@nuxt/types";
 import { NuxtAxiosInstance } from "@nuxtjs/axios";
-import { keyValueObject } from "~/models/keyValue.model";
+import { keyValueObject } from "../models/keyValue.model"; 
 
 /**
  * APIの実行を行うクラス。axiosをラップし、正常時はデータを返却、異常時はerror.vueへ描画する
