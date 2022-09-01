@@ -1,4 +1,4 @@
-import { keyValueObject } from "~/models/keyValue.model";
+import { keyValueObject } from "../models/keyValue.model";
 import BaseUseCase from "./base.usecase";
 
 export default class ProductUseCase extends BaseUseCase {
