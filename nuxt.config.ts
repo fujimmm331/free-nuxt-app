@@ -39,9 +39,21 @@ export default {
     // https://go.nuxtjs.dev/typescript
     '@nuxt/typescript-build',
     // https://go.nuxtjs.dev/tailwindcss
-    '@nuxtjs/tailwindcss',
+    '@nuxtjs/vuetify',
     '@nuxtjs/composition-api/module',
   ],
+
+  vuetify: {
+    theme: {
+      primary: '#03a9f4',
+      secondary: '#607d8b',
+      accent: '#9c27b0',
+      error: '#f44336',
+      warning: '#ffc107',
+      info: '#009688',
+      success: '#4caf50'
+    }
+  },
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
