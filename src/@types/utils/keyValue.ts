@@ -1,7 +1,6 @@
 /**
  * 汎用的なキーバリューオブジェクト
  */
-
-export interface keyValueObject  {
+export type KeyValueObject = {
   [key: string]: any
 }
