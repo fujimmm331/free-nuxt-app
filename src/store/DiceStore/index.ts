@@ -5,6 +5,7 @@ type DiceStateType = {
     dice: DiceRollType[]
     currentDiceRoll: DiceRollType
     index: number
+    status: 'START' | 'STOP'
   }
 }
 
@@ -17,6 +18,7 @@ export const provideDiceStore = () => {
       dice: ['U', 'O', 'KO', 'CHI', 'MA', 'N'],
       currentDiceRoll: 'U',
       index: 0,
+      status: 'STOP'
     }
   })
 
