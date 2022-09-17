@@ -1,4 +1,4 @@
-import { KeyValueObject } from "@/@types/utils/keyValue";
+import { KeyValueObject } from "@/types/utils/keyValue";
 import { Context } from "@nuxt/types";
 import { NuxtAxiosInstance } from "@nuxtjs/axios";
 
