@@ -1,1 +1,1 @@
-export * from './DiceStore/index'
+export * from './DiceIndexPageStore'
