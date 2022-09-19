@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import useDiceIndexPageSetResult from '@/store/DiceIndexPageStore/actions/useDiceIndexPageSetResult';
 import { DiceRollType, DiceStatusType } from '@/types';
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 type DicePropsType = {
   status: DiceStatusType
@@ -10,14 +10,20 @@ type DicePropsType = {
 type DiceStateType = {
   dice: DiceRollType[]
   index: number
-  timer: null | NodeJS.Timer
+  timer: {
+    value: null | NodeJS.Timer
+    ms: number
+  }
 }
 
 const props = defineProps<DicePropsType>()
 const diceState = reactive<DiceStateType>({
   dice: ['U', 'O', 'KO', 'CHI', 'MA', 'N'],
   index: 0,
-  timer: null
+  timer: {
+    value: null,
+    ms: 20
+  }
 })
 
 const setRandomIndex = () => {
@@ -33,15 +39,15 @@ watch(
   () => props.status,
   (status) => {
     if (status === 'START') {
-      diceState.timer = setInterval(() => {
+      diceState.timer.value = setInterval(() => {
         setRandomIndex()
-      }, 20)
+      }, diceState.timer.ms)
       return
     }
-    if (!diceState.timer) {
+    if (!diceState.timer.value) {
       return
     }
-    clearInterval(diceState.timer)
+    clearInterval(diceState.timer.value)
     setResult(diceState.dice[diceState.index])
   }
 )
