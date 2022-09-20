@@ -1,34 +1,26 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-type DialogStateType = {
-  isShow: boolean
-}
+import { useDialogStore } from '@/store';
+import useDialogStoreClose from '@/store/DialogStore/actions/useDialogStoreClose';
+import useDiceIndexPageGetResult from '@/store/DiceIndexPageStore/selector/useDiceIndexPageGetResult';
 
-const dialogState = reactive<DialogStateType>({
-  isShow: false
-})
+const dialogStore = useDialogStore()
+const closeDialog = useDialogStoreClose()
+const diceResult = useDiceIndexPageGetResult()
+
 </script>
 <template>
   <div class="text-center">
-    <v-dialog v-model="dialogState.isShow" width="500">
+    <v-dialog v-model="dialogStore.state.isShow" width="500">
       <v-card>
         <v-card-text>
-          OMANKO
+          {{ diceResult }}
         </v-card-text>
 
-        <v-card-text>
-          OCHINCHIN
-        </v-card-text>
-
-        <v-card-text>
-          UNKO
-        </v-card-text>
-
-        <v-divider></v-divider>
+        <v-divider />
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="dialogState.isShow = false">
+          <v-btn color="primary" text @click="closeDialog()">
             閉じる
           </v-btn>
         </v-card-actions>
