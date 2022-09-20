@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Dice from '@/components/molecules/dice/index.vue';
-import { DiceStatusType } from '@/types';
+import { DiceStatusType, TimerType } from '@/types';
 import { reactive, watch } from 'vue';
 type DiceListProps = {
   length: number
@@ -10,10 +10,7 @@ type DiceListProps = {
 type DiceListStateType = {
   index: number
   statuses: DiceStatusType[]
-  timer: {
-    value: null | NodeJS.Timer
-    ms: number
-  }
+  timer: TimerType
 }
 
 const props = defineProps<DiceListProps>()
@@ -22,7 +19,7 @@ const diceListState = reactive<DiceListStateType>({
   statuses: Array.from({ length: props.length }, () => props.status),
   timer: {
     ms: 500,
-    value: null
+    id: null
   }
 })
 
@@ -48,8 +45,8 @@ watch(
     if (props.status === 'STOP') {
       console.log('list timer')
       // サイコロを順番に止めていく処理
-      diceListState.timer.value = setInterval(() => {
-        if (props.length === diceListState.index && diceListState.timer.value) clearInterval(diceListState.timer.value)
+      diceListState.timer.id = setInterval(() => {
+        if (props.length === diceListState.index && diceListState.timer.id) clearInterval(diceListState.timer.id)
         setStatusesEvenlyTimerMs()
         incrementIndex()
       }, diceListState.timer.ms)
