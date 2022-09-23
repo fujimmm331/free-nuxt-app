@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import Dice from '@/components/molecules/dice/index.vue';
+import useDialogStoreOpen from '@/store/DialogStore/actions/useDialogStoreOpen';
+import useHandJudgeHand from '@/store/HandStore/actions/useHandJudgeHand';
 import { DiceStatusType, TimerType } from '@/types';
 import { reactive, watch } from 'vue';
 type DiceListProps = {
@@ -23,6 +25,9 @@ const diceListState = reactive<DiceListStateType>({
   }
 })
 
+const openDialog = useDialogStoreOpen()
+const judgeHands = useHandJudgeHand()
+
 const initializeIndex = () => {
   diceListState.index = 0
 }
@@ -43,10 +48,13 @@ watch(
   () => props.status,
   () => {
     if (props.status === 'STOP') {
-      console.log('list timer')
       // サイコロを順番に止めていく処理
       diceListState.timer.id = setInterval(() => {
-        if (props.length === diceListState.index && diceListState.timer.id) clearInterval(diceListState.timer.id)
+        if (props.length === diceListState.index && diceListState.timer.id) {
+          clearInterval(diceListState.timer.id)
+          judgeHands()
+          openDialog()
+        }
         setStatusesEvenlyTimerMs()
         incrementIndex()
       }, diceListState.timer.ms)
