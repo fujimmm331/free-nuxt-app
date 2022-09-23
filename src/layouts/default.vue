@@ -4,8 +4,9 @@
   </v-app>
 </template>
 <script setup lang="ts">
-import { provideDiceIndexPageStore, provideDialogStore } from '@/store';
+import { provideDiceIndexPageStore, provideDialogStore, provideHandStore } from '@/store';
 
 provideDiceIndexPageStore()
 provideDialogStore()
+provideHandStore()
 </script>
