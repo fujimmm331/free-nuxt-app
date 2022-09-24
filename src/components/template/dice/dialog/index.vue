@@ -1,18 +1,11 @@
 <script setup lang="ts">
 import useDialogStoreClose from '@/store/DialogStore/actions/useDialogStoreClose';
 import useDialogGetState from '@/store/DialogStore/selectors/useDialogGetState';
-import useHandResetHand from '@/store/HandStore/actions/useHandResetHand';
 import useHandGetState from '@/store/HandStore/selectors/useHandGetState';
-import { onBeforeUpdate, onUnmounted } from 'vue';
 
 const dialogState = useDialogGetState()
 const closeDialog = useDialogStoreClose()
 const handState = useHandGetState()
-const resetHandState = useHandResetHand()
-const onClose = () => {
-  closeDialog()
-  resetHandState()
-}
 
 </script>
 <template>
@@ -30,7 +23,7 @@ const onClose = () => {
         <v-card-text v-else>役なしですわ。。。。</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="onClose()">
+          <v-btn color="primary" text @click="closeDialog()">
             閉じる
           </v-btn>
         </v-card-actions>
