@@ -1,0 +1,8 @@
+export type HandType = 'CHINKO'
+  | 'OCHINKO'
+  | 'UNKO'
+  | 'UNCHI'
+  | 'MANKO'
+  | 'OMANKO'
+  | 'CHINCHIN'
+  | 'OCHINCHIN'

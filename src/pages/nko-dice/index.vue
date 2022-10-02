@@ -10,27 +10,46 @@
 
 <script setup lang="ts">
 import DiceList from '@/components/template/dice/DiceList.vue';
-import { useDiceIndexPageStore } from '@/store/DiceIndexPageStore';
-import useDiceIndexPageStartDice from '@/store/DiceIndexPageStore/actions/useDiceIndexPageStartDice';
 import Dialog from '@/components/template/dice/dialog/index.vue';
-import useDiceIndexPageStopDice from '@/store/DiceIndexPageStore/actions/useDiceIndexPageStopDice';
-import useDiceIndexPageGetButtonText from '@/store/DiceIndexPageStore/selector/useDiceIndexPageGetButtonText';
-import useDiceIndexPageGetIsCollectingResult from '@/store/DiceIndexPageStore/selector/useDiceIndexPageGetIsCollectingResult';
-import useDiceIndexPageInitializeResult from '@/store/DiceIndexPageStore/actions/useDiceIndexPageInitializeResult'
-import useHandResetHand from '@/store/HandStore/actions/useHandResetHand';
+import { useHandStore, useAllDiceResultStore } from '@/store';
+import { DiceStatusType } from '@/types';
+import { computed, reactive } from 'vue';
 
-const { state } = useDiceIndexPageStore()
-const startDice = useDiceIndexPageStartDice()
-const stopDice = useDiceIndexPageStopDice()
-const initializeResult = useDiceIndexPageInitializeResult()
-const buttonText = useDiceIndexPageGetButtonText()
-const isCollectingResult = useDiceIndexPageGetIsCollectingResult()
-const resetHandState = useHandResetHand()
+type IndexPageStateType = {
+  displayNumber: number
+  diceStatus: DiceStatusType
+}
+
+const state = reactive<IndexPageStateType>({
+  displayNumber: 5,
+  diceStatus: 'INITIAL'
+})
+
+const startDice = () => {
+  state.diceStatus = 'START'
+}
+
+const stopDice = () => {
+  state.diceStatus = 'STOP'
+}
+
+const allDiceResultStore = useAllDiceResultStore()
+
+const buttonText = computed(() => state.diceStatus === 'INITIAL' || state.diceStatus === 'STOP' ? 'すたと' : 'すとっぷ')
+const isCollectingResult = computed(() => {
+  if (state.diceStatus === 'INITIAL' || state.diceStatus === 'START') {
+    return false
+  }
+
+  return allDiceResultStore.state.result.length !== state.displayNumber
+})
+
+const handStore = useHandStore()
 
 const onClick = async () => {
   if (state.diceStatus === 'INITIAL' || state.diceStatus === 'STOP') {
-    initializeResult()
-    resetHandState()
+    allDiceResultStore.actions.initializeAllDiceResult()
+    handStore.actions.resetHandState()
     startDice()
     return
   }

@@ -1,20 +1,17 @@
 <script setup lang="ts">
-import useDialogStoreClose from '@/store/DialogStore/actions/useDialogStoreClose';
-import useDialogGetState from '@/store/DialogStore/selectors/useDialogGetState';
-import useHandGetState from '@/store/HandStore/selectors/useHandGetState';
+import { useDialogStore, useHandStore } from '@/store';
 
-const dialogState = useDialogGetState()
-const closeDialog = useDialogStoreClose()
-const handState = useHandGetState()
+const dialogStore = useDialogStore()
+const handStore = useHandStore()
 
 </script>
 <template>
   <div class="text-center">
-    <v-dialog v-model="dialogState.isShow" width="500">
+    <v-dialog v-model="dialogStore.state.isShow" width="500">
       <v-card>
         <v-card-title>結果</v-card-title>
-        <template v-if="handState.result.length > 0">
-          <v-card-text v-for=" hand in handState.result">
+        <template v-if="handStore.state.result.length > 0">
+          <v-card-text v-for=" hand in handStore.state.result">
             {{ hand }}
           </v-card-text>
           <v-divider />
@@ -23,7 +20,7 @@ const handState = useHandGetState()
         <v-card-text v-else>役なしですわ。。。。</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="closeDialog()">
+          <v-btn color="primary" text @click="dialogStore.actions.closeDialog()">
             閉じる
           </v-btn>
         </v-card-actions>
