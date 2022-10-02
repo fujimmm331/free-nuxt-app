@@ -1,7 +1,6 @@
 import { DiceRollType, HandType } from "@/types";
 import { inject, InjectionKey, provide, reactive, readonly } from "vue";
 type HandStateType = ReturnType<typeof handStore>
-type WithReadonly = DiceRollType | Readonly<DiceRollType>
 
 const handStoreKey: InjectionKey<HandStateType> = Symbol('handStore')
 

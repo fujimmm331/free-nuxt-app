@@ -3,7 +3,7 @@ type DialogStateType = ReturnType<typeof dialogStore>
 
 const dialogStoreKey: InjectionKey<DialogStateType> = Symbol('dialogStore')
 
-export const dialogStore = () => {
+const dialogStore = () => {
   const state = reactive({
     isShow: false
   })
@@ -30,7 +30,7 @@ export const provideDialogStore = () => {
 }
 
 export const useDialogStore = () => {
-  const store = inject<DialogStateType>(dialogStoreKey);
+  const store = inject(dialogStoreKey);
   if (!store) throw new Error('DialogStore is undefined')
   return store
 }
