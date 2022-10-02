@@ -1,8 +1,8 @@
-import { HandKeyType } from "@/const";
+import { HandType } from "@/types";
 import { inject, InjectionKey, provide, reactive, readonly } from "vue";
 type HandStateType = {
   state: {
-    result: HandKeyType[]
+    result: HandType[]
   }
 }
 

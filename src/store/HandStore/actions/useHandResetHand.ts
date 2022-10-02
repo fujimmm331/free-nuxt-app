@@ -1,4 +1,3 @@
-import { HandKeyType } from "@/const"
 import { useHandStore } from ".."
 
 export default () => {
