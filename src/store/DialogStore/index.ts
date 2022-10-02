@@ -1,22 +1,32 @@
 import { inject, InjectionKey, provide, reactive, readonly } from "vue";
-type DialogStateType = {
-  state: {
-    isShow: boolean
-  }
-}
-
+type DialogStateType = ReturnType<typeof dialogStore>
 
 const dialogStoreKey: InjectionKey<DialogStateType> = Symbol('dialogStore')
 
-export const provideDialogStore = () => {
-  const store = reactive<DialogStateType>({
-    state: {
-      isShow: false
-    }
+export const dialogStore = () => {
+  const state = reactive({
+    isShow: false
   })
 
-  provide(dialogStoreKey, store)
-  return readonly(store);
+  const openDialog = () => {
+    state.isShow = true
+  }
+
+  const closeDialog = () => {
+    state.isShow = false
+  }
+
+  return readonly({
+    state,
+    actions: {
+      openDialog,
+      closeDialog
+    }
+  })
+}
+
+export const provideDialogStore = () => {
+  return provide(dialogStoreKey, dialogStore())
 }
 
 export const useDialogStore = () => {
