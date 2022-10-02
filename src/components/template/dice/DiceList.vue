@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import Dice from '@/components/molecules/dice/index.vue';
-import { useDialogStore, useHandStore } from '@/store';
-import useDiceIndexPageGetResult from '@/store/DiceIndexPageStore/selector/useDiceIndexPageGetResult';
-import { DiceStatusType, TimerType } from '@/types';
+import { useAllDiceResultStore, useDialogStore, useHandStore } from '@/store';
+import { DiceRollType, DiceStatusType, TimerType } from '@/types';
 import { reactive, watch } from 'vue';
 type DiceListProps = {
   length: number
@@ -27,7 +26,7 @@ const diceListState = reactive<DiceListStateType>({
 
 const dialogStore = useDialogStore()
 const handStore = useHandStore()
-const diceResult = useDiceIndexPageGetResult()
+const allDiceResultStore = useAllDiceResultStore()
 
 const initializeIndex = () => {
   diceListState.index = 0
@@ -53,7 +52,7 @@ watch(
       diceListState.timer.id = setInterval(() => {
         if (props.length === diceListState.index && diceListState.timer.id) {
           clearInterval(diceListState.timer.id)
-          handStore.actions.judgeAndSetHands(diceResult.value)
+          handStore.actions.judgeAndSetHands(allDiceResultStore.state.result as DiceRollType[])
           dialogStore.actions.openDialog()
         }
         setStatusesEvenlyTimerMs()
