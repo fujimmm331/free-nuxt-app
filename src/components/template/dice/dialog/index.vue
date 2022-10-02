@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { useDialogStore } from '@/store';
-import useHandGetState from '@/store/HandStore/selectors/useHandGetState';
+import { useDialogStore, useHandStore } from '@/store';
 
 const dialogStore = useDialogStore()
-const handState = useHandGetState()
+const handStore = useHandStore()
 
 </script>
 <template>
@@ -11,8 +10,8 @@ const handState = useHandGetState()
     <v-dialog v-model="dialogStore.state.isShow" width="500">
       <v-card>
         <v-card-title>結果</v-card-title>
-        <template v-if="handState.result.length > 0">
-          <v-card-text v-for=" hand in handState.result">
+        <template v-if="handStore.state.result.length > 0">
+          <v-card-text v-for=" hand in handStore.state.result">
             {{ hand }}
           </v-card-text>
           <v-divider />

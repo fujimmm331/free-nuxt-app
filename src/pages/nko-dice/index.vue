@@ -17,7 +17,7 @@ import useDiceIndexPageStopDice from '@/store/DiceIndexPageStore/actions/useDice
 import useDiceIndexPageGetButtonText from '@/store/DiceIndexPageStore/selector/useDiceIndexPageGetButtonText';
 import useDiceIndexPageGetIsCollectingResult from '@/store/DiceIndexPageStore/selector/useDiceIndexPageGetIsCollectingResult';
 import useDiceIndexPageInitializeResult from '@/store/DiceIndexPageStore/actions/useDiceIndexPageInitializeResult'
-import useHandResetHand from '@/store/HandStore/actions/useHandResetHand';
+import { useHandStore } from '@/store';
 
 const { state } = useDiceIndexPageStore()
 const startDice = useDiceIndexPageStartDice()
@@ -25,12 +25,12 @@ const stopDice = useDiceIndexPageStopDice()
 const initializeResult = useDiceIndexPageInitializeResult()
 const buttonText = useDiceIndexPageGetButtonText()
 const isCollectingResult = useDiceIndexPageGetIsCollectingResult()
-const resetHandState = useHandResetHand()
+const handStore = useHandStore()
 
 const onClick = async () => {
   if (state.diceStatus === 'INITIAL' || state.diceStatus === 'STOP') {
     initializeResult()
-    resetHandState()
+    handStore.actions.resetHandState()
     startDice()
     return
   }
