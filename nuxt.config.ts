@@ -69,5 +69,17 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    /*
+    ** You can extend webpack config here
+    */
+    extend (config: { module: { rules: { test: RegExp; loader: string; options: { name: string } }[] } }, ctx: any) {
+      config.module.rules.push({
+        test: /\.(ogg|mp3|wav|mpe?g)$/i,
+        loader: 'file-loader',
+        options: {
+          name: '[path][name].[ext]'
+        }
+      })
+    }
   }
 }
