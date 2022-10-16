@@ -1,23 +1,44 @@
-import { DiceRollType } from "@/types";
-import { reactive, readonly, toRefs } from "vue";
+import { DiceRollType, TimerType } from "@/types";
+import { computed, reactive, readonly, toRefs } from "vue";
 type DiceStateType = {
   dice: DiceRollType[]
-  currentDiceRoll: DiceRollType
+  index: number
+  timer: TimerType
 }
 
 export const useDice = () => {
-  const state = reactive<DiceStateType>({
+  const diceState = reactive<DiceStateType>({
     dice: ['U', 'O', 'KO', 'CHI', 'MA', 'N'],
-    currentDiceRoll: 'U'
+    index: 0,
+    timer: {
+      id: null,
+      ms: 20
+    }
   })
 
-  const setCurrentDiceRoll = (diceRoll: DiceRollType) => {
-    state.currentDiceRoll = diceRoll
+  const currentDiceRoll = computed<DiceRollType>(() => diceState.dice[diceState.index])
+
+  const setRandomIndex = () => {
+    const randomIndex = Math.floor(Math.random() * diceState.dice.length)
+    diceState.index = randomIndex
+  }
+
+  const setDiceStateTimer = () => {
+    diceState.timer.id = setInterval(() => {
+      setRandomIndex()
+    }, diceState.timer.ms)
+  }
+
+  const clearDiceStateTimer = () => {
+    if (!diceState.timer.id) return
+    clearInterval(diceState.timer.id)
   }
 
   return {
-    state: readonly(state),
-    setCurrentDiceRoll
+    diceState: readonly(diceState),
+    currentDiceRoll,
+    clearDiceStateTimer,
+    setDiceStateTimer
   }
 }
 

@@ -3,6 +3,7 @@ import { DiceRollType, DiceStatusType } from '@/types';
 import { computed, reactive, watch } from 'vue';
 import type { TimerType } from '@/types'
 import { useAllDiceResultStore } from '@/store';
+import { useDice } from '@/composable/dice/useDice';
 
 type DicePropsType = {
   status: DiceStatusType
@@ -14,39 +15,19 @@ type DiceStateType = {
   timer: TimerType
 }
 
+const { diceState, currentDiceRoll, clearDiceStateTimer, setDiceStateTimer } = useDice()
 const props = defineProps<DicePropsType>()
-const diceState = reactive<DiceStateType>({
-  dice: ['U', 'O', 'KO', 'CHI', 'MA', 'N'],
-  index: 0,
-  timer: {
-    id: null,
-    ms: 20
-  }
-})
-
-const setRandomIndex = () => {
-  const randomIndex = Math.floor(Math.random() * diceState.dice.length)
-  diceState.index = randomIndex
-}
-
 const allDiceResultStore = useAllDiceResultStore()
-
-const currentDiceRoll = computed<DiceRollType>(() => diceState.dice[diceState.index])
 
 watch(
   () => props.status,
   (status) => {
     if (status === 'START') {
-      diceState.timer.id = setInterval(() => {
-        setRandomIndex()
-      }, diceState.timer.ms)
-      return
+      setDiceStateTimer()
+    } else {
+      clearDiceStateTimer()
+      allDiceResultStore.actions.setAllDiceResult(diceState.dice[diceState.index])
     }
-    if (!diceState.timer.id) {
-      return
-    }
-    clearInterval(diceState.timer.id)
-    allDiceResultStore.actions.setAllDiceResult(diceState.dice[diceState.index])
   }
 )
 
